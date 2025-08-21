@@ -1,0 +1,4 @@
+database.driver = com.mysql.cj.jdbc.Driver
+database.jdbc-url = jdbc:mysql://localhost/donate4cats?user=root&password=root&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Jakarta
+
+redis.url = redis://localhost
