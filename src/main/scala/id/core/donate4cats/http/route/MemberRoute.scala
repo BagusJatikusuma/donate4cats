@@ -27,7 +27,7 @@ final class MemberRoute[F[_]: Async](
   sessionStore: SessionStore[F]
 ) extends Http4sDsl[F] {
 
-  val protectedRoutes = AuthedRoutes.of[SessionData, F] {
+  val protectedRoutes: AuthedRoutes[SessionData, F] = AuthedRoutes.of {
 
     case GET -> Root / "profile" as session =>
       val user = session.payload

@@ -19,7 +19,6 @@ object CookieAuthMiddleware:
 
     val authUser: Kleisli[F, Request[F], Either[Response[F], SessionData]] =
       Kleisli { req =>
-        println("come here")
         req.cookies.find(_.name == CookieName) match
           case Some(cookie) =>
             store.get(SessionToken.make(cookie.content).toOption.get).map {

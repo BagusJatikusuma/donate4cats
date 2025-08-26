@@ -39,7 +39,7 @@ class MemberAuthServiceLive[F[_]: Async](
         hashedPass <- getMemberPassword(member)
 
         isValid <- run(BCrypt.verifyer.verify(password.asString.toCharArray, hashedPass).verified)
-        _       <- when(isValid) failWith AuthError.WrongPassword
+        _       <- whenNot(isValid) failWith AuthError.WrongPassword
 
       yield member
 
@@ -123,18 +123,23 @@ class MemberAuthServiceLive[F[_]: Async](
   private def getMemberByEmail(email: Email): F[Option[Member]] =
     for
       memberRes <- MemberQuery.getMemberByEmail(email).option.transact(xa).attempt
-      memberOpt <- if memberRes.isLeft 
-                      then throw new RuntimeException(s"DB Error ${memberRes.left.toOption.get.getMessage()}", memberRes.left.toOption.get)
-                      else memberRes.toOption.get.pure[F]
-    yield memberOpt
+      _         <- when(memberRes.isLeft) throwError {
+        val exc = memberRes.left.toOption.get
+        val msg = exc.getMessage()
+        new RuntimeException(s"DB Error $msg", exc)
+      }
+    yield memberRes.toOption.get
 
   private def getMemberPassword(member: Member): F[String] =
     for
       passRes <- MemberQuery.getPassword(member).option.transact(xa).attempt
-      passOpt <- if passRes.isLeft 
-                    then throw new RuntimeException(s"DB Error ${passRes.left.toOption.get.getMessage()}", passRes.left.toOption.get) 
-                    else passRes.toOption.get.pure[F]
-    yield passOpt.get
+      _       <- when(passRes.isLeft) throwError {
+        val exc = passRes.left.toOption.get
+        val msg = exc.getMessage()
+        new RuntimeException(s"DB Error $msg", exc)
+      }
+      _   <- Async[F].delay(println(passRes.toOption.get.get))
+    yield passRes.toOption.get.get
 
   
 }

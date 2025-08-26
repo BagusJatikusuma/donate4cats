@@ -13,6 +13,8 @@ import id.core.donate4cats.service.MemberAuth
 import id.core.donate4cats.service.SessionStore
 import id.core.donate4cats.http.route.MemberRoute
 import id.core.donate4cats.http.middleware.ExceptionMiddleware
+import org.http4s.server.Router
+import id.core.donate4cats.http.middleware.CookieAuthMiddleware
 
 object Donate4catsServer:
 
@@ -26,8 +28,11 @@ object Donate4catsServer:
 
       memberRoute = MemberRoute(memberService, memberAuth, sessionStore)
 
-      httpApp = (
-        memberRoute.publicRoutes
+      authMiddleware = CookieAuthMiddleware.makeMiddleware[F](sessionStore) 
+
+      httpApp = Router(
+        "/private"  -> authMiddleware(memberRoute.protectedRoutes),
+        "/public"   -> memberRoute.publicRoutes
       ).orNotFound
 
       httpAppMiddleware = 

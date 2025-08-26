@@ -46,6 +46,9 @@ final case class WhenMonad[F[_]: MonadThrow, A](cond: Boolean):
 def when[F[_]: MonadThrow, A](cond: Boolean): WhenMonad[F, A] = 
   WhenMonad(cond)
 
+def whenNot[F[_]: MonadThrow, A](cond: Boolean): WhenMonad[F, A] = 
+  WhenMonad(!cond)
+
 def run[F[_]: Sync, A](ops: => A): F[A] = Sync[F].delay(ops)
 
 def runBlock[F[_]: Sync, A](ops: => A): F[A] = Sync[F].blocking(ops)
