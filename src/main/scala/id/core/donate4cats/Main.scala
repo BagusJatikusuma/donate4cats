@@ -8,6 +8,7 @@ import id.core.donate4cats.service.DoobieDatabase
 import id.core.donate4cats.service.impl.MemberAuthServiceLive
 import id.core.donate4cats.service.impl.RedisSessionStore
 import id.core.donate4cats.service.impl.MemberServiceLive
+import id.core.donate4cats.service.impl.CreatorServiceLive
 
 object Main extends IOApp.Simple:
   val run =
@@ -23,9 +24,10 @@ object Main extends IOApp.Simple:
     
     getResource.use { case(redis, xa) =>
       
-      val memberAuth    = MemberAuthServiceLive(xa)
-      val sessionStore  = RedisSessionStore(redis)
-      val memberService = MemberServiceLive(xa)
+      val memberAuth      = MemberAuthServiceLive(xa)
+      val sessionStore    = RedisSessionStore(redis)
+      val memberService   = MemberServiceLive(xa)
+      val creatorService  = CreatorServiceLive(xa)
 
-      Donate4catsServer.run[IO](memberService, memberAuth, sessionStore)
+      Donate4catsServer.run[IO](memberService, memberAuth, sessionStore, creatorService)
     }

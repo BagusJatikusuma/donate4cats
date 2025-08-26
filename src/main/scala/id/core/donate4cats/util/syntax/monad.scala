@@ -23,8 +23,10 @@ def continueWith[F[_]: Applicative, A](value: A): F[A] = Applicative[F].pure(val
 
 def imperative[F[_]: MonadThrow, A](ops: F[A]): F[A] = {
   ops.handleErrorWith {
-    case Early(v: A @unchecked) => MonadThrow[F].pure(v)
-    case exc                    => MonadThrow[F].raiseError(exc)
+    case Early(v: A @unchecked) =>  
+      MonadThrow[F].pure(v)
+    case exc =>
+      MonadThrow[F].raiseError(exc)
   }
 }
 
@@ -33,7 +35,11 @@ final case class WhenMonad[F[_]: MonadThrow, A](cond: Boolean):
     if (cond) then MonadThrow[F].raiseError(Early(x))
     else ().pure[F]
 
+  def failWithM(x: F[A]): F[Unit] = x.flatMap(failWith(_))
+
   def finishWith(x: A): F[Unit] = failWith(x)
+
+  def finishWithM(x: F[A]): F[Unit] = x.flatMap(failWith(_))
 
   def returnWith(value: A): F[Unit] = failWith(value)
 

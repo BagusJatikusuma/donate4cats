@@ -24,4 +24,9 @@ object CreatorProfile:
   def genId[F[_]: Sync]: F[String] = Sync[F].delay {
     val currtime = LocalDateTime.now()
     s"CRT${currtime.format(datetimeFormatter)}"
-  } 
+  }
+  
+  import org.http4s.*
+  import org.http4s.circe.*
+
+  given [F[_]: Concurrent]: EntityEncoder[F, CreatorProfile] = jsonEncoderOf 
