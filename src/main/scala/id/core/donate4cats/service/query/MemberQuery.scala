@@ -5,7 +5,7 @@ import doobie.implicits.*
 import doobie.implicits.javatimedrivernative._
 import neotype.interop.doobie.given
 
-import id.core.donate4cats.domain.Member
+import id.core.donate4cats.domain.*
 import id.core.donate4cats.service.MemberAuth.ResetPasswordCred
 
 object MemberQuery {
@@ -16,7 +16,7 @@ object MemberQuery {
     """
     .query[Member]
 
-  def getMemberByEmail(email: Member.Email): Query0[Member] =
+  def getMemberByEmail(email: Email): Query0[Member] =
     sql"""
     SELECT id, name, email, created_at FROM members WHERE email = $email
     """

@@ -1,16 +1,16 @@
 package id.core.donate4cats.service
 
-import id.core.donate4cats.domain.Member
+import id.core.donate4cats.domain.*
 import java.time.LocalDateTime
 
 trait MemberAuth[F[_]] {
 
-  def basicAuth(email: Member.Email, password: Member.Password): F[MemberAuth.AuthError | Member]
+  def basicAuth(email: Email, password: Password): F[MemberAuth.AuthError | Member]
   
   def basicRegister(
-    name: Member.Name,
-    email: Member.Email,
-    password: Member.Password
+    name: Name,
+    email: Email,
+    password: Password
   ): F[MemberAuth.RegistrationError | Member]
 
   def forgotPassword(member: Member): F[MemberAuth.ResetPasswordCred]
@@ -19,7 +19,7 @@ trait MemberAuth[F[_]] {
 
   def validateResetPasswordCred(cred: MemberAuth.ResetPasswordCred): F[MemberAuth.ResetPasswordCredInvalidity | Unit]
 
-  def resetPassword(member: Member, password: Member.Password): F[Unit]
+  def resetPassword(member: Member, password: Password): F[Unit]
 
 }
 

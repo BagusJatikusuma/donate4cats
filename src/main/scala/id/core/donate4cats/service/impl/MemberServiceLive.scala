@@ -7,8 +7,7 @@ import doobie.implicits.*
 
 import id.core.donate4cats.util.syntax.monad.*
 
-import id.core.donate4cats.domain.Member.Email
-import id.core.donate4cats.domain.Member
+import id.core.donate4cats.domain.*
 import id.core.donate4cats.service.MemberService
 import id.core.donate4cats.service.query.MemberQuery
 

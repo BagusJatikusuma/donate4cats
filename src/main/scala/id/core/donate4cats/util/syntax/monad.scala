@@ -14,7 +14,12 @@ def finishWith[F[_]: MonadThrow, A](value: A): F[Unit] =
 def failWith[F[_]: MonadThrow, A](value: A): F[Unit] = 
   MonadThrow[F].raiseError(Early(value))
 
+def errorWith[F[_]: MonadThrow, A](error: Throwable): F[A] = 
+  MonadThrow[F].raiseError(error)
+
 def continue[F[_]: Applicative]: F[Unit] = ().pure[F] 
+
+def continueWith[F[_]: Applicative, A](value: A): F[A] = Applicative[F].pure(value)
 
 def imperative[F[_]: MonadThrow, A](ops: F[A]): F[A] = {
   ops.handleErrorWith {

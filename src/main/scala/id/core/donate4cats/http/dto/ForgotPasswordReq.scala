@@ -7,9 +7,9 @@ import io.circe.*
 import io.circe.generic.semiauto.*
 import neotype.interop.circe.given
 
-import id.core.donate4cats.domain.Member
+import id.core.donate4cats.domain.*
 
-final case class ForgotPasswordReq(email: Member.Email)
+final case class ForgotPasswordReq(email: Email)
 
 object ForgotPasswordReq:
 

@@ -9,12 +9,12 @@ import io.circe.*
 import io.circe.Decoder.Result
 import neotype.interop.circe.given
 
-import id.core.donate4cats.domain.Member
+import id.core.donate4cats.domain.*
 import id.core.donate4cats.util.syntax.monad.*
 
 final case class ResetPasswordReq(
   token: String,
-  newPassword: Member.Password
+  newPassword: Password
 )
 
 object ResetPasswordReq:
@@ -22,7 +22,7 @@ object ResetPasswordReq:
   private def decode(c: HCursor): ValidatedNel[String, ResetPasswordReq] = 
     (
       c.get[String]("token").toValidatedNelField("Token"),
-      c.get[Member.Password]("newPassword").toValidatedNelField("Password")
+      c.get[Password]("newPassword").toValidatedNelField("Password")
     ).mapN(ResetPasswordReq.apply)
 
   given Decoder[ResetPasswordReq] = new Decoder:

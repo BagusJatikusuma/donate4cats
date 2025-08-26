@@ -9,8 +9,7 @@ import io.circe.*
 import io.circe.Decoder.Result
 import neotype.interop.circe.given
 
-import id.core.donate4cats.domain.Member.Email
-import id.core.donate4cats.domain.Member.Password
+import id.core.donate4cats.domain.*
 import id.core.donate4cats.util.syntax.monad.*
 
 final case class SigninReq(email: Email, password: Password)

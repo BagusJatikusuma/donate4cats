@@ -7,10 +7,7 @@ import doobie.implicits.*
 
 import id.core.donate4cats.util.syntax.monad.*
 
-import id.core.donate4cats.domain.Member
-import id.core.donate4cats.domain.Member.Email
-import id.core.donate4cats.domain.Member.Name
-import id.core.donate4cats.domain.Member.Password
+import id.core.donate4cats.domain.*
 
 import id.core.donate4cats.service.MemberAuth
 import id.core.donate4cats.service.MemberAuth.AuthError
@@ -101,7 +98,7 @@ class MemberAuthServiceLive[F[_]: Async](
       yield ()
     }
 
-  override def resetPassword(member: Member, password: Member.Password): F[Unit] =
+  override def resetPassword(member: Member, password: Password): F[Unit] =
     for 
       hashedPass <- runBlock(BCrypt.withDefaults().hashToString(8, password.asString.toCharArray))
       res        <- MemberQuery.updatePassword(member, hashedPass).run.transact(xa).attempt

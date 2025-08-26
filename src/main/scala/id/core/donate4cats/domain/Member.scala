@@ -16,8 +16,8 @@ import java.time.format.DateTimeFormatter
 
 final case class Member(
   id: Member.Id,
-  name: Member.Name,
-  email: Member.Email,
+  name: Name,
+  email: Email,
   createdAt: LocalDateTime
 )
 
@@ -31,30 +31,6 @@ object Member:
 
     extension (id: Id) 
       def asString: String = id.show
-
-  type Name = Name.Type
-  object Name extends Newtype[String]:
-    override def validate(input: String): Boolean | String = 
-      if input.isBlank() then "Member name should not be empty"
-      else true
-
-    extension (name: Name)
-      def asString: String = name.show
-
-  type Email = Email.Type
-  object Email extends Newtype[String]:
-    override def validate(input: String): Boolean | String = 
-      if input.isBlank() then "Invalid email"
-      else true
-
-  type Password = Password.Type
-  object Password extends Newtype[String]:
-    override def validate(input: String): Boolean | String = 
-      if input.isBlank() then "Password should ne be empty"
-      else true
-
-    extension (pass: Password)
-      def asString: String = pass.show
 
   lazy val datetimeFormatter = DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")
 
