@@ -14,7 +14,7 @@ def finishWith[F[_]: MonadThrow, A](value: A): F[Unit] =
 def failWith[F[_]: MonadThrow, A](value: A): F[Unit] = 
   MonadThrow[F].raiseError(Early(value))
 
-def errorWith[F[_]: MonadThrow, A](error: Throwable): F[A] = 
+def errorWith[F[_]: MonadThrow, A](error: => Throwable): F[A] = 
   MonadThrow[F].raiseError(error)
 
 def continue[F[_]: Applicative]: F[Unit] = ().pure[F] 
@@ -37,9 +37,11 @@ final case class WhenMonad[F[_]: MonadThrow, A](cond: Boolean):
 
   def returnWith(value: A): F[Unit] = failWith(value)
 
-  def throwError(exc: Throwable): F[Unit] = 
-    if (cond) MonadThrow[F].raiseError(exc)
-    else ().pure[F]
+  def throwError(exc: => Throwable): F[Unit] =
+    if cond then
+      MonadThrow[F].raiseError(exc)
+    else 
+      ().pure[F]
 
 def when[F[_]: MonadThrow, A](cond: Boolean): WhenMonad[F, A] = 
   WhenMonad(cond)

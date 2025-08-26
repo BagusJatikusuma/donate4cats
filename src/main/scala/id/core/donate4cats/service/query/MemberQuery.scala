@@ -28,6 +28,12 @@ object MemberQuery {
     """
     .query[String]
 
+  def init(member: Member, password: String): Update0 =
+    sql"""
+    INSERT INTO members(id, name, email, password, created_at) VALUES (${member.id}, ${member.name}, ${member.email}, $password, ${member.createdAt})
+    """
+    .update
+
   def insert(member: Member): Update0 = 
     sql"""
     INSERT INTO members(id, name, email, created_at) VALUES(${member.id}, ${member.name}, ${member.email}, ${member.createdAt})

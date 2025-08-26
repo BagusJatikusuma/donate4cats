@@ -11,7 +11,7 @@ import id.core.donate4cats.domain.*
 import id.core.donate4cats.service.MemberService
 import id.core.donate4cats.service.query.MemberQuery
 
-class MemberServiceLive[F[_]: Concurrent](
+class MemberServiceLive[F[_]: Async](
   xa: Transactor[F]
 ) extends MemberService[F] {
 

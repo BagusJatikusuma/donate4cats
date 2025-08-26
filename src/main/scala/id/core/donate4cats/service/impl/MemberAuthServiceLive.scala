@@ -53,20 +53,21 @@ class MemberAuthServiceLive[F[_]: Async](
     imperative {
 
       for
+        currtime  <- run(LocalDateTime.now())
+
         memberOpt <- getMemberByEmail(email)
         _         <- when(memberOpt.isDefined) failWith RegistrationError.EmailUsed
 
         memberId <- Member.generateId
-        member   =  Member(id = memberId, name = name, email = email, createdAt = LocalDateTime.now())
+        member   =  Member(id = memberId, name = name, email = email, createdAt = currtime)
 
         hashedPass <- runBlock(BCrypt.withDefaults().hashToString(8, password.asString.toCharArray))
+        res        <- MemberQuery.init(member, hashedPass).run.transact(xa).attempt
 
-        res   <-  ( for
-                      _ <- MemberQuery.insert(member).run
-                      _ <- MemberQuery.updatePassword(member, hashedPass).run
-                    yield ()
-                  ).transact(xa).attempt
-        _     <- when(res.isLeft) throwError new RuntimeException(s"DB error: ${res.left.toOption.get.getMessage()}", res.left.toOption.get)
+        _     <- when(res.isLeft) throwError {
+          val exc = res.left.toOption.get
+          new RuntimeException(s"DB error: ${exc.getMessage()}", exc)
+        }
       yield member
 
     }

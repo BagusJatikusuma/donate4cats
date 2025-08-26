@@ -22,9 +22,10 @@ object Main extends IOApp.Simple:
       yield (redis, database)
     
     getResource.use { case(redis, xa) =>
-      val memberService = MemberServiceLive(xa)
+      
       val memberAuth    = MemberAuthServiceLive(xa)
       val sessionStore  = RedisSessionStore(redis)
+      val memberService = MemberServiceLive(xa)
 
       Donate4catsServer.run[IO](memberService, memberAuth, sessionStore)
     }
