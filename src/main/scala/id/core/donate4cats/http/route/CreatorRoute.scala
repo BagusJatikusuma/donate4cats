@@ -88,6 +88,18 @@ class CreatorRoute[F[_]: Async](
   }
 
   val publicRoutes = HttpRoutes.of[F] {
+
+    case GET -> Root / "creator" / creatorId =>
+      imperative {
+        for
+          opt   <- creatorService.getBydId(creatorId)
+          _     <- when(opt.isEmpty) finishWith Response[F](Status.NotFound).withEntity(MessageRes("Creator does not exist"))
+
+          creator = opt.get
+
+          response <- Ok(creator)
+        yield response
+      }
     
     case GET -> Root / "creator" / creatorId / "photo" =>
       imperative {
