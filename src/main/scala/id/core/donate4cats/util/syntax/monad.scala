@@ -31,17 +31,17 @@ def imperative[F[_]: MonadThrow, A](ops: F[A]): F[A] = {
 }
 
 final case class WhenMonad[F[_]: MonadThrow, A](cond: Boolean):
-  def failWith(x: A): F[Unit] =
+  def failWith(x: => A): F[Unit] =
     if (cond) then MonadThrow[F].raiseError(Early(x))
     else ().pure[F]
 
   def failWithM(x: F[A]): F[Unit] = x.flatMap(failWith(_))
 
-  def finishWith(x: A): F[Unit] = failWith(x)
+  def finishWith(x: => A): F[Unit] = failWith(x)
 
   def finishWithM(x: F[A]): F[Unit] = x.flatMap(failWith(_))
 
-  def returnWith(value: A): F[Unit] = failWith(value)
+  def returnWith(value: => A): F[Unit] = failWith(value)
 
   def throwError(exc: => Throwable): F[Unit] =
     if cond then

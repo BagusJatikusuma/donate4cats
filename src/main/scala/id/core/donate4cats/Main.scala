@@ -9,6 +9,7 @@ import id.core.donate4cats.service.impl.MemberAuthServiceLive
 import id.core.donate4cats.service.impl.RedisSessionStore
 import id.core.donate4cats.service.impl.MemberServiceLive
 import id.core.donate4cats.service.impl.CreatorServiceLive
+import id.core.donate4cats.service.impl.CreatorStorageFile
 
 object Main extends IOApp.Simple:
   val run =
@@ -20,14 +21,15 @@ object Main extends IOApp.Simple:
           config.database.driver,
           config.database.jdbcUrl
         )
-      yield (redis, database)
+      yield (config, redis, database)
     
-    getResource.use { case(redis, xa) =>
+    getResource.use { case(config, redis, xa) =>
       
-      val memberAuth      = MemberAuthServiceLive(xa)
-      val sessionStore    = RedisSessionStore(redis)
-      val memberService   = MemberServiceLive(xa)
-      val creatorService  = CreatorServiceLive(xa)
+      val memberAuth      = MemberAuthServiceLive[IO](xa)
+      val sessionStore    = RedisSessionStore[IO](redis)
+      val memberService   = MemberServiceLive[IO](xa)
+      val creatorStorage  = CreatorStorageFile[IO](config)
+      val creatorService  = CreatorServiceLive[IO](xa, creatorStorage)
 
-      Donate4catsServer.run[IO](memberService, memberAuth, sessionStore, creatorService)
+      Donate4catsServer.run[IO](memberService, memberAuth, sessionStore, creatorService, creatorStorage)
     }

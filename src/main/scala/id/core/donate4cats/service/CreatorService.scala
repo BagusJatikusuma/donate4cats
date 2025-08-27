@@ -4,6 +4,7 @@ import id.core.donate4cats.domain.Member
 import id.core.donate4cats.domain.CreatorProfile
 
 import CreatorService.*
+import id.core.donate4cats.http.dto.FilePart
 
 trait CreatorService[F[_]] {
 
@@ -11,7 +12,7 @@ trait CreatorService[F[_]] {
 
   def getByUsername(username: String): F[Option[CreatorProfile]]
   
-  def create(member: Member, username: String, displayName: String, bio: String): F[CreateError | CreatorProfile]
+  def create(member: Member, username: String, displayName: String, bio: String, photo: FilePart): F[CreateError | CreatorProfile]
 
   def edit(creator: CreatorProfile, displayName: String, bio: String): F[Unit]
 

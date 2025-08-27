@@ -8,7 +8,9 @@ final case class DatabaseConfig(driver: String, jdbcUrl: String) derives ConfigR
 
 final case class RedisConfig(url: String) derives ConfigReader
 
-final case class AppConfig(database: DatabaseConfig, redis: RedisConfig) derives ConfigReader
+final case class WorkDir(path: String) derives ConfigReader
+
+final case class AppConfig(database: DatabaseConfig, redis: RedisConfig, workdir: WorkDir) derives ConfigReader
 
 object AppConfig:
 

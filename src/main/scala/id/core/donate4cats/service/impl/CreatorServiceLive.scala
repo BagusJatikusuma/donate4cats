@@ -1,6 +1,7 @@
 package id.core.donate4cats.service.impl
 
 import cats.effect.*
+import cats.effect.syntax.all.*
 import cats.syntax.all.*
 import doobie.*
 import doobie.implicits.*
@@ -10,14 +11,17 @@ import id.core.donate4cats.util.syntax.monad.*
 import id.core.donate4cats.service.query.CreatorQuery
 import id.core.donate4cats.service.CreatorService
 import id.core.donate4cats.service.CreatorService.CreateError
+import id.core.donate4cats.service.CreatorStorage
 
 import id.core.donate4cats.domain.CreatorProfile
 import id.core.donate4cats.domain.Member
+import id.core.donate4cats.http.dto.FilePart
 
 import java.time.LocalDateTime
 
 class CreatorServiceLive[F[_]: Async](
-  xa: Transactor[F]
+  xa: Transactor[F],
+  storage: CreatorStorage[F]
 ) extends CreatorService[F] {
 
   override def getBydId(id: String): F[Option[CreatorProfile]] =
@@ -44,7 +48,8 @@ class CreatorServiceLive[F[_]: Async](
     member: Member, 
     username: String, 
     displayName: String, 
-    bio: String
+    bio: String,
+    photo: FilePart
   ): F[CreateError | CreatorProfile] = 
     imperative {
 
@@ -66,6 +71,7 @@ class CreatorServiceLive[F[_]: Async](
         )
 
         _   <- insert(creator)
+        _   <- storage.savePhoto(creator, photo).start
 
       yield creator
 

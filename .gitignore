@@ -33,6 +33,9 @@ Thumbs.db
 logs/
 *.log
 
+# generated assets
+assets/
+
 # IntelliJ IDEA (if contributors use it)
 .idea/
 *.iml
