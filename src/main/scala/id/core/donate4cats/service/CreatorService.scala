@@ -11,6 +11,8 @@ trait CreatorService[F[_]] {
   def getBydId(id: String): F[Option[CreatorProfile]]
 
   def getByUsername(username: String): F[Option[CreatorProfile]]
+
+  def getByMember(member: Member): F[List[CreatorProfile]]
   
   def create(member: Member, username: String, displayName: String, bio: String, photo: FilePart): F[CreateError | CreatorProfile]
 

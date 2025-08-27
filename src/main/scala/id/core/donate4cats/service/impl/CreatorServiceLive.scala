@@ -44,6 +44,9 @@ class CreatorServiceLive[F[_]: Async](
       }
     yield res.toOption.get
 
+  override def getByMember(member: Member): F[List[CreatorProfile]] = 
+    CreatorQuery.getByMember(member).to[List].transact(xa)
+
   override def create(
     member: Member, 
     username: String, 

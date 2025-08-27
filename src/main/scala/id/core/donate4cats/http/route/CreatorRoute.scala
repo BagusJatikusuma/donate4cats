@@ -2,7 +2,9 @@ package id.core.donate4cats.http.route
 
 import cats.effect.*
 import cats.syntax.all.*
+import io.circe.Encoder
 import org.http4s.*
+import org.http4s.circe.*
 import org.http4s.dsl.Http4sDsl
 import org.http4s.multipart.Multipart
 import org.typelevel.ci.*
@@ -24,8 +26,16 @@ class CreatorRoute[F[_]: Async](
   creatorService: CreatorService[F],
   creatorStorage: CreatorStorage[F]
 ) extends Http4sDsl[F] {
+
+  implicit def listEntityEncoder[A: Encoder]: EntityEncoder[F, List[A]] = jsonEncoderOf
   
   val privateRoutes: AuthedRoutes[SessionData, F] = AuthedRoutes.of {
+
+    case GET -> Root / "creator" / "data" as session =>
+      for
+        creators <- creatorService.getByMember(session.payload)
+        response <- Ok(creators)
+      yield response
 
     case ctx @ POST -> Root / "creator" as session => 
       ctx.req.decode[Multipart[F]] { m => 
