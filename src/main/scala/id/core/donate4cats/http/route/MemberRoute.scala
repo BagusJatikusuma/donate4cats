@@ -47,10 +47,10 @@ final class MemberRoute[F[_]: Async](
         response  <- result match {
 
           case MemberAuth.AuthError.UserNotFound => 
-            Response[F](Status.Unauthorized).withEntity(MessageRes("Member or password does not match")).pure[F]
+            Response(Status.Unauthorized).withEntity(MessageRes("Member or password does not match")).pure[F]
 
           case MemberAuth.AuthError.WrongPassword => 
-            Response[F](Status.Unauthorized).withEntity(MessageRes("Member or password does not match")).pure[F]
+            Response(Status.Unauthorized).withEntity(MessageRes("Member or password does not match")).pure[F]
 
           case user: Member => 
             val ttlSeconds = 3600L
@@ -81,7 +81,7 @@ final class MemberRoute[F[_]: Async](
         for
           payload   <- req.as[ForgotPasswordReq]
           memberOpt <- memberService.getByEmail(payload.email)
-          _         <- when(memberOpt.isEmpty) finishWith NotFound(MessageRes("Member with this email does not exist"))
+          _         <- when(memberOpt.isEmpty) finishWithM NotFound(MessageRes("Member with this email does not exist"))
           member    =  memberOpt.get
 
           resetCred <- memberAuth.forgotPassword(member)
@@ -95,7 +95,7 @@ final class MemberRoute[F[_]: Async](
           payload   <- req.as[ResetPasswordReq]
 
           credOpt   <- memberAuth.getResetPasswordCred(payload.token)
-          _         <- when(credOpt.isEmpty) finishWith NotFound(MessageRes("Token does not exist"))
+          _         <- when(credOpt.isEmpty) finishWithM NotFound(MessageRes("Token does not exist"))
           resetCred =  credOpt.get
 
           memberOpt <- memberService.getById(resetCred.memberId)

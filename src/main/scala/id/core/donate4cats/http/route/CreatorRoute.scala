@@ -45,7 +45,7 @@ class CreatorRoute[F[_]: Async](
             convRes   <- CreateCreatorReq.fromMultipart(m)
             _         <- when(convRes.isLeft) finishWith {
               val msg = convRes.left.toOption.get
-              Response[F](Status.BadRequest).withEntity(MessageRes(msg))
+              Response(Status.BadRequest).withEntity(MessageRes(msg))
             }
 
             payload = convRes.toOption.get
@@ -84,7 +84,7 @@ class CreatorRoute[F[_]: Async](
         for
           payload <- ctx.req.as[EditCreatorReq]
           opt     <- creatorService.getBydId(payload.creatorId)
-          _       <- when(opt.isEmpty) finishWith NotFound(MessageRes("Creator does not exist"))
+          _       <- when(opt.isEmpty) finishWithM NotFound(MessageRes("Creator does not exist"))
 
           creator = opt.get
 
@@ -103,7 +103,7 @@ class CreatorRoute[F[_]: Async](
       imperative {
         for
           opt   <- creatorService.getBydId(creatorId)
-          _     <- when(opt.isEmpty) finishWith Response[F](Status.NotFound).withEntity(MessageRes("Creator does not exist"))
+          _     <- when(opt.isEmpty) finishWithM NotFound(MessageRes("Creator does not exist"))
 
           creator = opt.get
 
@@ -115,7 +115,7 @@ class CreatorRoute[F[_]: Async](
       imperative {
         for
           opt   <- creatorService.getBydId(creatorId)
-          _     <- when(opt.isEmpty) finishWith Response[F](Status.NotFound).withEntity(MessageRes("Creator does not exist"))
+          _     <- when(opt.isEmpty) finishWithM NotFound(MessageRes("Creator does not exist"))
 
           creator = opt.get
 
