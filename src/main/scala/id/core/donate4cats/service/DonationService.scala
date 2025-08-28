@@ -5,6 +5,7 @@ import id.core.donate4cats.domain.*
 trait DonationService[F[_]] {
 
   def makeDonation(
+    donateId: String,
     donatur: Donatur,
     message: String,
     creator: CreatorProfile,

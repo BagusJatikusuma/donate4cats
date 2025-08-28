@@ -26,6 +26,16 @@ final class MidtransService[F[_]: Async](
 
   import MidtransService.*
   import id.core.donate4cats.service.query.MidtransQuery
+
+  def getByOrderId(orderId: String): F[Option[MidtransSession]] =
+    for
+      res <- MidtransQuery.getSessionByOrderId(orderId).option.transact(xa).attempt
+      _   <- when(res.isLeft) throwError {
+        val exc = res.left.toOption.get
+        val msg = exc.getMessage()
+        new RuntimeException(s"DB Error: $msg", exc)
+      }
+    yield res.toOption.get
   
   def initSession(
     donatur: Donatur,

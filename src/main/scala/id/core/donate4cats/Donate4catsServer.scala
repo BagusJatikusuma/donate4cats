@@ -10,12 +10,13 @@ import org.http4s.implicits.*
 // import org.http4s.server.middleware.Logger
 import org.http4s.server.Router
 
-import id.core.donate4cats.service.MemberService
-import id.core.donate4cats.service.MemberAuth
-import id.core.donate4cats.service.SessionStore
 import id.core.donate4cats.service.CreatorService
 import id.core.donate4cats.service.CreatorStorage
+import id.core.donate4cats.service.DonationService
+import id.core.donate4cats.service.MemberService
+import id.core.donate4cats.service.MemberAuth
 import id.core.donate4cats.service.MidtransService
+import id.core.donate4cats.service.SessionStore
 
 import id.core.donate4cats.http.route.MemberRoute
 import id.core.donate4cats.http.route.CreatorRoute
@@ -32,14 +33,15 @@ object Donate4catsServer:
     sessionStore: SessionStore[F],
     creatorService: CreatorService[F],
     creatorStorage: CreatorStorage[F],
-    midtransService: MidtransService[F]
+    midtransService: MidtransService[F],
+    donationService: DonationService[F]
   ): F[Nothing] = {
     for {
       client <- EmberClientBuilder.default[F].build
 
       memberRoute   = MemberRoute(memberService, memberAuth, sessionStore)
       creatorRoute  = CreatorRoute(creatorService, creatorStorage)
-      donateRoute   = DonateRoute(midtransService, creatorService)
+      donateRoute   = DonateRoute(midtransService, creatorService, donationService)
 
       authMiddleware = CookieAuthMiddleware.makeMiddleware[F](sessionStore) 
 

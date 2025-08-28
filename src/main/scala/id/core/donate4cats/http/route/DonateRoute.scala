@@ -8,16 +8,20 @@ import org.http4s.dsl.Http4sDsl
 import id.core.donate4cats.domain.Donatur
 
 import id.core.donate4cats.service.CreatorService
+import id.core.donate4cats.service.DonationService
 import id.core.donate4cats.service.MidtransService
 
 import id.core.donate4cats.http.dto.MakeDonationReq
 import id.core.donate4cats.http.dto.MessageRes
+import id.core.donate4cats.http.dto.MidtransPaymentCallback
 
 import id.core.donate4cats.util.syntax.monad.*
 
+
 final class DonateRoute[F[_]: Async](
   midtransService: MidtransService[F],
-  creatorService: CreatorService[F]
+  creatorService: CreatorService[F],
+  donationService: DonationService[F]
 ) extends Http4sDsl[F] {
 
 
@@ -44,11 +48,24 @@ final class DonateRoute[F[_]: Async](
       }
 
     case req @ POST -> Root / "midtrans-callback-handler" =>
-      for
-        payload <- req.as[String]
-        _       <- run(println(payload))
-        resp    <- Ok("ok")
-      yield resp
+      imperative {
+        for
+          payload <- req.as[MidtransPaymentCallback]
+
+          sessOpt <- midtransService.getByOrderId(payload.orderId)
+          _       <- when(sessOpt.isEmpty) finishWith Response(Status.NotFound).withEntity(MessageRes("Session does not exist"))
+
+          session =  sessOpt.get
+          
+          creatorOpt <- creatorService.getBydId(session.creatorId)
+          _          <- when(creatorOpt.isEmpty) throwError new RuntimeException("midtrans session creator does not exist")
+
+          creator = creatorOpt.get
+
+          _   <- donationService.makeDonation(session.orderId, Donatur(name = "not found lol", email = "hehe@gmail.com"), message = "forgot save to session lol", creator, payload.grossAmount)
+
+        yield Response(Status.Ok).withEntity(MessageRes("received"))
+      }
 
   }
 

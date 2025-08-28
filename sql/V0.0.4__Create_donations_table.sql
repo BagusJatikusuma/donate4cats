@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS donations (id VARCHAR(50) PRIMARY KEY, creator_id VARCHAR(50) NOT NULL, amount BIGINT NOT NULL, message TEXT, donatur_name VARCHAR(500) NOT NULL, donatur_email VARCHAR(500) NOT NULL, created_at DATETIME NOT NULL, FOREIGN KEY(creator_id) REFERENCES creators(id));
