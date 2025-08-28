@@ -38,14 +38,18 @@ object MidtransPaymentCallback:
           typeStr     <- c.get[String]("payment_type")
           paymentType <- typeStr match
             case "bank_transfer" => 
-              for
-                vas <- c.get[List[VAPaymentType]]("va_numbers")
-              yield PaymentType.VAPayment(vas.head.vaNumber, vas.head.bank)
+              c.get[String]("permata_va_number") match
+                case Left(_) =>
+                  for
+                    vas <- c.get[List[VAPaymentType]]("va_numbers")
+                  yield PaymentType.VAPayment(vas.head.vaNumber, vas.head.bank)
+                
+                case Right(vaNum) => Right(PaymentType.VAPayment(vaNum, "permata"))
 
             case "echannel" =>
               for
                 billKey <- c.get[String]("bill_key")
-              yield PaymentType.VAPaymentType(billKey, "mandiri")
+              yield PaymentType.VAPayment(billKey, "mandiri")
 
             case _ => Left(DecodingFailure.apply("not supported yet", List()))
                 
