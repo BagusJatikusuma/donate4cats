@@ -42,6 +42,11 @@ object MidtransPaymentCallback:
                 vas <- c.get[List[VAPaymentType]]("va_numbers")
               yield PaymentType.VAPayment(vas.head.vaNumber, vas.head.bank)
 
+            case "echannel" =>
+              for
+                billKey <- c.get[String]("bill_key")
+              yield PaymentType.VAPaymentType(billKey, "mandiri")
+
             case _ => Left(DecodingFailure.apply("not supported yet", List()))
                 
         yield paymentType
@@ -50,7 +55,6 @@ object MidtransPaymentCallback:
 
   given Decoder[MidtransPaymentCallback] = new Decoder:
     def apply(c: HCursor): Result[MidtransPaymentCallback] = 
-      println(c.value)
       for 
         orderId     <- c.get[String]("order_id")
         amount      <- c.get[Double]("gross_amount")
