@@ -2,7 +2,7 @@ package id.core.donate4cats.service.query
 
 import doobie.*
 import doobie.implicits.*
-import doobie.implicits.javatimedrivernative._
+import doobie.implicits.javatimedrivernative.*
 import neotype.interop.doobie.given
 
 import id.core.donate4cats.domain.*

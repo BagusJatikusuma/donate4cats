@@ -10,7 +10,14 @@ final case class RedisConfig(url: String) derives ConfigReader
 
 final case class WorkDir(path: String) derives ConfigReader
 
-final case class AppConfig(database: DatabaseConfig, redis: RedisConfig, workdir: WorkDir) derives ConfigReader
+final case class Midtrans(prod: Boolean, merchantId: String, clientKey: String, serverKey: String) derives ConfigReader
+
+final case class AppConfig(
+  database: DatabaseConfig, 
+  redis: RedisConfig, 
+  workdir: WorkDir,
+  midtrans: Midtrans
+) derives ConfigReader
 
 object AppConfig:
 

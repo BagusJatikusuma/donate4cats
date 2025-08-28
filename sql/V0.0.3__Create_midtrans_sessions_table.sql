@@ -1,0 +1,1 @@
+CREATE TABLE midtrans_sessions (order_id VARCHAR(50) PRIMARY KEY, token VARCHAR(100) NOT NULL, redirect_url TEXT NOT NULL, creator_id VARCHAR(50) NOT NULL, created_at DATETIME NOT NULL, FOREIGN KEY (creator_id) REFERENCES creators(id));

@@ -4,3 +4,8 @@ database.jdbc-url = jdbc:mysql://localhost/donate4cats?user=root&password=root&u
 redis.url = redis://localhost
 
 workdir.path = /home
+
+midtrans.prod = false
+midtrans.merchant-id = MERCHANTID
+midtrans.client-key = CLIENTKEY
+midtrans.server-key = SERVERKEY
