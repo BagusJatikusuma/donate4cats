@@ -20,9 +20,11 @@ import id.core.donate4cats.http.dto.MessageRes
 import id.core.donate4cats.http.dto.ForgotPasswordReq
 import id.core.donate4cats.http.dto.ResetPasswordReq
 
-import id.core.donate4cats.util.syntax.monad.*
 import id.core.donate4cats.http.view.SigninPage
 import id.core.donate4cats.http.view.SignupPage
+import id.core.donate4cats.http.view.Homepage
+
+import id.core.donate4cats.util.syntax.monad.*
 
 final class MemberRoute[F[_]: Async](
   memberService: MemberService[F],
@@ -42,6 +44,10 @@ final class MemberRoute[F[_]: Async](
   }
   
   val publicRoutes = HttpRoutes.of[F] {
+
+    case req @ GET -> Root =>
+      Async[F].delay(println(req.uri.query.multiParams)) *>
+      Ok(Homepage.index())
 
     case GET -> Root / "signin" =>
       Ok(SigninPage.index())
