@@ -4,6 +4,7 @@ import cats.effect.*
 import cats.syntax.all.*
 import org.http4s.*
 import org.http4s.dsl.Http4sDsl
+import org.http4s.scalatags.*
 
 import id.core.donate4cats.domain.Member
 import id.core.donate4cats.service.MemberService
@@ -20,6 +21,8 @@ import id.core.donate4cats.http.dto.ForgotPasswordReq
 import id.core.donate4cats.http.dto.ResetPasswordReq
 
 import id.core.donate4cats.util.syntax.monad.*
+import id.core.donate4cats.http.view.SigninPage
+import id.core.donate4cats.http.view.SignupPage
 
 final class MemberRoute[F[_]: Async](
   memberService: MemberService[F],
@@ -39,6 +42,9 @@ final class MemberRoute[F[_]: Async](
   }
   
   val publicRoutes = HttpRoutes.of[F] {
+
+    case GET -> Root / "signin" =>
+      Ok(SigninPage.index())
 
     case req @ POST -> Root / "signin" => 
       for
@@ -64,6 +70,9 @@ final class MemberRoute[F[_]: Async](
 
         }
       yield response
+
+    case GET -> Root / "signup" =>
+      Ok(SignupPage.index())
 
     case req @ POST -> Root / "signup" =>
       for 

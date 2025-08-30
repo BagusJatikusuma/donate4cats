@@ -33,6 +33,8 @@ lazy val root = (project in file("."))
       "io.github.kitlangton" %% "neotype" % NeoTypeVersion,
       "io.github.kitlangton" %% "neotype-circe" % NeoTypeVersion,
       "io.github.kitlangton" %% "neotype-doobie" % NeoTypeVersion,
+      "com.lihaoyi" %% "scalatags" % "0.13.1",
+      "org.http4s" %% "http4s-scalatags" % "0.25.0",
       "at.favre.lib" % "bcrypt" % "0.10.2",
       "com.zaxxer" % "HikariCP" % "6.3.0",
       "mysql" % "mysql-connector-java" % "8.0.33",

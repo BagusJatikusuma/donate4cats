@@ -50,7 +50,7 @@ object Donate4catsServer:
 
       httpApp = Router(
         "/private"  -> authMiddleware(privateRoutes),
-        "/public"   -> publicRoutes
+        ""          -> publicRoutes
       ).orNotFound
 
       httpAppMiddleware = 
