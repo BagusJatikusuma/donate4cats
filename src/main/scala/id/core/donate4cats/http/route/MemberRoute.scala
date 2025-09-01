@@ -46,8 +46,8 @@ final class MemberRoute[F[_]: Async](
   val publicRoutes = HttpRoutes.of[F] {
 
     case req @ GET -> Root =>
-      Async[F].delay(println(req.uri.query.multiParams)) *>
       Ok(Homepage.index())
+      
 
     case GET -> Root / "signin" =>
       Ok(SigninPage.index())

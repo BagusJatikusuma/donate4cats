@@ -12,11 +12,14 @@ final case class WorkDir(path: String) derives ConfigReader
 
 final case class Midtrans(prod: Boolean, merchantId: String, clientKey: String, serverKey: String) derives ConfigReader
 
+final case class KindeAuthConfig(domain: String, clientId: String, clientSecret: String, redirectUri: String, redirectLogout: String) derives ConfigReader
+
 final case class AppConfig(
   database: DatabaseConfig, 
   redis: RedisConfig, 
   workdir: WorkDir,
-  midtrans: Midtrans
+  midtrans: Midtrans,
+  kinde: KindeAuthConfig
 ) derives ConfigReader
 
 object AppConfig:

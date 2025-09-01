@@ -18,7 +18,6 @@ import id.core.donate4cats.service.impl.DonationServiceLive
 import id.core.donate4cats.vendor.midtrans.snap.MidtransConfig
 import id.core.donate4cats.vendor.midtrans.snap.MidtransSnap
 
-
 object Main extends IOApp.Simple:
   val run =
     val getResource = 

@@ -24,7 +24,6 @@ import id.core.donate4cats.http.route.DonateRoute
 import id.core.donate4cats.http.middleware.ExceptionMiddleware
 import id.core.donate4cats.http.middleware.CookieAuthMiddleware
 
-
 object Donate4catsServer:
 
   def run[F[_]: Async: Network](
