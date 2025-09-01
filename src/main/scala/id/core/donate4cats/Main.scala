@@ -46,5 +46,5 @@ object Main extends IOApp.Simple:
       val creatorService  = CreatorServiceLive[IO](xa, creatorStorage)
       val donationService = DonationServiceLive[IO](xa)
 
-      Donate4catsServer.run[IO](memberService, memberAuth, sessionStore, creatorService, creatorStorage, midtransService, donationService)
+      Donate4catsServer.run[IO](config, memberService, memberAuth, sessionStore, creatorService, creatorStorage, midtransService, donationService)
     }

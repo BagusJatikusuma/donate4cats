@@ -25,6 +25,7 @@ import id.core.donate4cats.http.view.SignupPage
 import id.core.donate4cats.http.view.Homepage
 
 import id.core.donate4cats.util.syntax.monad.*
+import id.core.donate4cats.service.SessionStore.SessionToken
 
 final class MemberRoute[F[_]: Async](
   memberService: MemberService[F],
@@ -32,21 +33,39 @@ final class MemberRoute[F[_]: Async](
   sessionStore: SessionStore[F]
 ) extends Http4sDsl[F] {
 
-  val protectedRoutes: AuthedRoutes[SessionData, F] = AuthedRoutes.of {
+  val protectedRoutes: AuthedRoutes[(SessionToken, SessionData), F] = AuthedRoutes.of {
 
     case GET -> Root / "profile" as session =>
-      val user = session.payload
+      val user = session._2.payload
       Ok(user)
 
     case req @ PUT -> Root / "profile" as session =>
       Ok("Unimplemented....")
+
+    case PUT -> Root / "logout" as session =>
+      for
+        _     <- sessionStore.delete(session._1)
+        resp  <- Ok(MessageRes("success logout"))
+      yield resp.addCookie(CookieAuthMiddleware.removeSessionCookie)
 
   }
   
   val publicRoutes = HttpRoutes.of[F] {
 
     case req @ GET -> Root =>
-      Ok(Homepage.index())
+      req.cookies.find(_.name == "session_id") match
+        case None => Ok(Homepage.index())
+        case Some(cookie) =>
+          val sessId = cookie.content
+          for
+            sessionOpt <- sessionStore.get(SessionToken.make(sessId).toOption.get)
+            resp  <- sessionOpt match
+              case None => 
+                Ok(Homepage.index())
+              
+              case Some(session) =>
+                Ok(Homepage.index(Some(session.payload)))
+          yield resp
       
 
     case GET -> Root / "signin" =>

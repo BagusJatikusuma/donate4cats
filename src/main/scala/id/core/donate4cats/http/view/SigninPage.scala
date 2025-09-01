@@ -9,6 +9,7 @@ object SigninPage {
     html(
       head(
         scalatags.Text.tags2.title("Donate 4 cats | Signin"),
+        script(src := "/assets/js/signin.js"),
         script(src := "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4")
       ),
       body(
@@ -30,6 +31,7 @@ object SigninPage {
                   div(label("Email")),
                   div(
                     input(
+                      id := "email-field",
                       cls := "bg-blue-100 w-full p-2 text-[12px]",
                       `type` := "email",
                     )
@@ -40,6 +42,7 @@ object SigninPage {
                   div(label("Password")),
                   div(
                     input(
+                      id := "password-field",
                       cls := "bg-blue-100 w-full p-2 text-[12px]",
                       `type` := "password"
                     )
@@ -51,6 +54,7 @@ object SigninPage {
               cls := "space-y-1",
               div(
                 button(
+                  onclick := "signin()",
                   cls := "bg-blue-500 hover:bg-blue-500 text-white w-[150px] text-left p-2 px-3",
                   "Sign in"
                 )

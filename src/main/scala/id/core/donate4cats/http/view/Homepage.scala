@@ -1,5 +1,7 @@
 package id.core.donate4cats.http.view
 
+import id.core.donate4cats.domain.Member
+
 import scalatags.Text.all.*
 import scalatags.Text.TypedTag
 
@@ -7,7 +9,7 @@ import scalatags.Text.TypedTag
 
 object Homepage {
   
-  private def header(): TypedTag[String] =
+  private def header(member: Option[Member] = None): TypedTag[String] =
     // val clientId    = "c110b87666eb419ab4b09f7bcbe9b8fc"
     // val redirectUrl = "http://localhost:8080"
     // val token       = UUID.randomUUID().toString()
@@ -18,26 +20,38 @@ object Homepage {
         "Donate 4 Cats"
       ),
       div(
-        div(
-          a(
-            href := s"/signin",
-            button(
-              cls := "cursor-pointer text-[12px] p-2 px-3 rounded-md border border-blue-500",
-              "Sign in"
-            )
-          )
-        )
+        div {
+          member match
+            case None =>
+              a(
+                href := s"/signin",
+                button(
+                  cls := "cursor-pointer text-[12px] p-2 px-3 rounded-md border border-blue-500",
+                  "Sign in"
+                )
+              )
+            case Some(mbr) =>
+              a(
+                href := s"/signin",
+                button(
+                  cls := "cursor-pointer text-[12px] p-2 px-3 rounded-md border border-blue-500",
+                  "My Home"
+                )
+              )
+        }
       )
     )
 
-  def index(): TypedTag[String] =
+  def index(
+    member: Option[Member] = None
+  ): TypedTag[String] =
     html(
       head(
         scalatags.Text.tags2.title("Donate 4 cats"),
         script(src := "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4")
       ),
       div(
-        header(),
+        header(member),
       )
     )
 

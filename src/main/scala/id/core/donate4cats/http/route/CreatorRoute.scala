@@ -17,6 +17,7 @@ import id.core.donate4cats.service.CreatorService
 import id.core.donate4cats.service.CreatorService.CreateError
 import id.core.donate4cats.service.CreatorStorage
 import id.core.donate4cats.service.SessionStore.SessionData
+import id.core.donate4cats.service.SessionStore.SessionToken
 
 import id.core.donate4cats.http.dto.MessageRes
 import id.core.donate4cats.http.dto.CreateCreatorReq
@@ -29,11 +30,11 @@ class CreatorRoute[F[_]: Async](
 
   implicit def listEntityEncoder[A: Encoder]: EntityEncoder[F, List[A]] = jsonEncoderOf
   
-  val privateRoutes: AuthedRoutes[SessionData, F] = AuthedRoutes.of {
+  val privateRoutes: AuthedRoutes[(SessionToken, SessionData), F] = AuthedRoutes.of {
 
     case GET -> Root / "creator" / "data" as session =>
       for
-        creators <- creatorService.getByMember(session.payload)
+        creators <- creatorService.getByMember(session._2.payload)
         response <- Ok(creators)
       yield response
 
@@ -50,7 +51,7 @@ class CreatorRoute[F[_]: Async](
 
             payload = convRes.toOption.get
 
-            result    <- creatorService.create(session.payload, payload.username, payload.displayName, payload.bio, payload.file)
+            result    <- creatorService.create(session._2.payload, payload.username, payload.displayName, payload.bio, payload.file)
             response  <- result match
               case CreateError.UsernameAlreadyTaken => 
                 BadRequest(MessageRes("Username already taken. choose another one"))

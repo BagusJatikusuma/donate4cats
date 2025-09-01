@@ -14,15 +14,16 @@ import id.core.donate4cats.service.SessionStore.SessionToken
 object CookieAuthMiddleware:
   private val CookieName = "session_id"
 
-  def makeMiddleware[F[_]: Async](store: SessionStore[F]): AuthMiddleware[F, SessionData] =
+  def makeMiddleware[F[_]: Async](store: SessionStore[F]): AuthMiddleware[F, (SessionToken, SessionData)] =
     val dsl = new Http4sDsl[F] {}; import dsl.*
 
-    val authUser: Kleisli[F, Request[F], Either[Response[F], SessionData]] =
+    val authUser: Kleisli[F, Request[F], Either[Response[F], (SessionToken, SessionData)]] =
       Kleisli { req =>
         req.cookies.find(_.name == CookieName) match
           case Some(cookie) =>
-            store.get(SessionToken.make(cookie.content).toOption.get).map {
-              case Some(session) => Right(session)
+            val token = SessionToken.make(cookie.content).toOption.get
+            store.get(token).map {
+              case Some(session) => Right((token, session))
               case None          => Left(Response[F](status = Status.Unauthorized))
             }
           case None =>
@@ -42,5 +43,16 @@ object CookieAuthMiddleware:
       secure   = true,               // for HTTPS only, false for local dev
       sameSite = Some(SameSite.Strict),
       maxAge   = Some(ttlSeconds),
+      path     = Some("/")           // ensure it applies to whole site
+    )
+  
+  def removeSessionCookie: ResponseCookie =
+    ResponseCookie(
+      name     = CookieName,
+      content  = "deleted",
+      httpOnly = true,
+      secure   = true,               // for HTTPS only, false for local dev
+      sameSite = Some(SameSite.Strict),
+      maxAge   = Some(1),
       path     = Some("/")           // ensure it applies to whole site
     )

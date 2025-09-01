@@ -4,11 +4,13 @@ import cats.effect.Async
 import cats.syntax.all.*
 import com.comcast.ip4s.*
 import fs2.io.net.Network
+import fs2.io.file.Files
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits.*
 // import org.http4s.server.middleware.Logger
 import org.http4s.server.Router
+import org.http4s.server.staticcontent._
 
 import id.core.donate4cats.service.CreatorService
 import id.core.donate4cats.service.CreatorStorage
@@ -27,6 +29,7 @@ import id.core.donate4cats.http.middleware.CookieAuthMiddleware
 object Donate4catsServer:
 
   def run[F[_]: Async: Network](
+    config: AppConfig,
     memberService: MemberService[F],
     memberAuth: MemberAuth[F],
     sessionStore: SessionStore[F],
@@ -35,6 +38,9 @@ object Donate4catsServer:
     midtransService: MidtransService[F],
     donationService: DonationService[F]
   ): F[Nothing] = {
+    
+    given Files[F] = Files.forAsync
+
     for {
       client <- EmberClientBuilder.default[F].build
 
@@ -48,12 +54,12 @@ object Donate4catsServer:
       publicRoutes  = memberRoute.publicRoutes <+> creatorRoute.publicRoutes <+> donateRoute.publicRoutes
 
       httpApp = Router(
+        "/assets"   -> fileService[F](FileService.Config(s"${config.workdir.path}/assets")),
         "/private"  -> authMiddleware(privateRoutes),
         ""          -> publicRoutes
       ).orNotFound
 
-      httpAppMiddleware = 
-        // ExceptionMiddleware.catchMiddleware[F] andThen Logger.httpApp(true, true)
+      httpAppMiddleware =
         ExceptionMiddleware.catchMiddleware[F]
 
       finalHttpApp = httpAppMiddleware(httpApp)
