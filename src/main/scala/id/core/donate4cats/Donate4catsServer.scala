@@ -19,10 +19,12 @@ import id.core.donate4cats.service.MemberService
 import id.core.donate4cats.service.MemberAuth
 import id.core.donate4cats.service.MidtransService
 import id.core.donate4cats.service.SessionStore
+import id.core.donate4cats.service.BankAccountService
 
 import id.core.donate4cats.http.route.MemberRoute
 import id.core.donate4cats.http.route.CreatorRoute
 import id.core.donate4cats.http.route.DonateRoute
+import id.core.donate4cats.http.route.BankAccountRoute
 import id.core.donate4cats.http.middleware.ExceptionMiddleware
 import id.core.donate4cats.http.middleware.CookieAuthMiddleware
 
@@ -36,7 +38,8 @@ object Donate4catsServer:
     creatorService: CreatorService[F],
     creatorStorage: CreatorStorage[F],
     midtransService: MidtransService[F],
-    donationService: DonationService[F]
+    donationService: DonationService[F],
+    bankAccountService: BankAccountService[F]
   ): F[Nothing] = {
     
     given Files[F] = Files.forAsync
@@ -47,10 +50,11 @@ object Donate4catsServer:
       memberRoute   = MemberRoute(memberService, memberAuth, sessionStore)
       creatorRoute  = CreatorRoute(creatorService, creatorStorage)
       donateRoute   = DonateRoute(midtransService, creatorService, donationService)
+      bankAccRoute  = BankAccountRoute(bankAccountService)
 
       authMiddleware = CookieAuthMiddleware.makeMiddleware[F](sessionStore) 
 
-      privateRoutes = memberRoute.protectedRoutes <+> creatorRoute.privateRoutes
+      privateRoutes = memberRoute.protectedRoutes <+> creatorRoute.privateRoutes <+> bankAccRoute.protectedRoutes
       publicRoutes  = memberRoute.publicRoutes <+> creatorRoute.publicRoutes <+> donateRoute.publicRoutes
 
       httpApp = Router(

@@ -8,7 +8,11 @@ final case class Member private (
   email: Email,
   createdAt: LocalDateTime,
   status: Member.Status
-)
+) {
+
+  def setActive = this.copy(status = Member.Status.Active)
+
+}
 
 object Member:
 

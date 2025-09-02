@@ -14,6 +14,7 @@ import id.core.donate4cats.service.impl.MemberServiceLive
 import id.core.donate4cats.service.impl.CreatorServiceLive
 import id.core.donate4cats.service.impl.CreatorStorageFile
 import id.core.donate4cats.service.impl.DonationServiceLive
+import id.core.donate4cats.service.impl.BankAccountServiceLive
 
 import id.core.donate4cats.vendor.midtrans.snap.MidtransConfig
 import id.core.donate4cats.vendor.midtrans.snap.MidtransSnap
@@ -45,6 +46,17 @@ object Main extends IOApp.Simple:
       val creatorStorage  = CreatorStorageFile[IO](config)
       val creatorService  = CreatorServiceLive[IO](xa, creatorStorage)
       val donationService = DonationServiceLive[IO](xa)
+      val bankAccService  = BankAccountServiceLive[IO](xa)
 
-      Donate4catsServer.run[IO](config, memberService, memberAuth, sessionStore, creatorService, creatorStorage, midtransService, donationService)
+      Donate4catsServer.run[IO](
+        config, 
+        memberService, 
+        memberAuth, 
+        sessionStore, 
+        creatorService, 
+        creatorStorage, 
+        midtransService, 
+        donationService,
+        bankAccService
+      )
     }
