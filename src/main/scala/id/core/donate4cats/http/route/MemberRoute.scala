@@ -23,6 +23,7 @@ import id.core.donate4cats.http.dto.ResetPasswordReq
 import id.core.donate4cats.http.view.SigninPage
 import id.core.donate4cats.http.view.SignupPage
 import id.core.donate4cats.http.view.Homepage
+import id.core.donate4cats.http.view.MemberHomePage
 
 import id.core.donate4cats.util.syntax.monad.*
 import id.core.donate4cats.service.SessionStore.SessionToken
@@ -34,6 +35,9 @@ final class MemberRoute[F[_]: Async](
 ) extends Http4sDsl[F] {
 
   val protectedRoutes: AuthedRoutes[(SessionToken, SessionData), F] = AuthedRoutes.of {
+
+    case GET -> Root / "home" as session =>
+      Ok(MemberHomePage.index(session._2.payload))
 
     case GET -> Root / "profile" as session =>
       val user = session._2.payload
