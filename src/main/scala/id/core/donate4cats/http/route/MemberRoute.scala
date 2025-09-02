@@ -46,7 +46,7 @@ final class MemberRoute[F[_]: Async](
     case req @ PUT -> Root / "profile" as session =>
       Ok("Unimplemented....")
 
-    case PUT -> Root / "logout" as session =>
+    case PUT -> Root / "signout" as session =>
       for
         _     <- sessionStore.delete(session._1)
         resp  <- Ok(MessageRes("success logout"))
