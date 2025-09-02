@@ -34,7 +34,7 @@ logs/
 *.log
 
 # generated assets
-assets/
+assets/creators/
 
 # IntelliJ IDEA (if contributors use it)
 .idea/

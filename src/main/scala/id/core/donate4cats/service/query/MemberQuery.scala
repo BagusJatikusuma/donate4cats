@@ -12,13 +12,13 @@ object MemberQuery {
   
   def getMemberById(id: Member.Id): Query0[Member] =
     sql"""
-    SELECT id, name, email, created_at FROM members WHERE id = $id
+    SELECT id, name, email, created_at, status FROM members WHERE id = $id
     """
     .query[Member]
 
   def getMemberByEmail(email: Email): Query0[Member] =
     sql"""
-    SELECT id, name, email, created_at FROM members WHERE email = $email
+    SELECT id, name, email, created_at, status FROM members WHERE email = $email
     """
     .query[Member]
 
@@ -30,13 +30,13 @@ object MemberQuery {
 
   def init(member: Member, password: String): Update0 =
     sql"""
-    INSERT INTO members(id, name, email, password, created_at) VALUES (${member.id}, ${member.name}, ${member.email}, $password, ${member.createdAt})
+    INSERT INTO members(id, name, email, password, created_at, status) VALUES (${member.id}, ${member.name}, ${member.email}, $password, ${member.createdAt}, ${member.status})
     """
     .update
 
   def insert(member: Member): Update0 = 
     sql"""
-    INSERT INTO members(id, name, email, created_at) VALUES(${member.id}, ${member.name}, ${member.email}, ${member.createdAt})
+    INSERT INTO members(id, name, email, created_at, status) VALUES(${member.id}, ${member.name}, ${member.email}, ${member.createdAt}, ${member.status})
     """
     .update
 

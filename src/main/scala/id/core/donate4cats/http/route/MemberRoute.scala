@@ -103,9 +103,11 @@ final class MemberRoute[F[_]: Async](
       for 
         payload   <- req.as[SignupReq]
         result    <- memberAuth.basicRegister(payload.name, payload.email, payload.password)
+        
         response  <- result match
           case RegistrationError.EmailUsed => 
             BadRequest("Email already used")
+
           case member: Member => Ok(member)
           
       yield response

@@ -1,27 +1,33 @@
 package id.core.donate4cats.domain
 
-import cats.*
-import cats.effect.*
-import cats.syntax.all.*
-import org.http4s.EntityEncoder
-import org.http4s.circe.*
-import io.circe.generic.semiauto.*
-import io.circe.{Decoder, Encoder}
-import neotype.Newtype
-import neotype.interop.cats.given
-import neotype.interop.circe.given
-
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-final case class Member(
+final case class Member private (
   id: Member.Id,
   name: Name,
   email: Email,
-  createdAt: LocalDateTime
+  createdAt: LocalDateTime,
+  status: Member.Status
 )
 
 object Member:
+
+  import cats.*
+  import cats.effect.*
+  import cats.syntax.all.*
+  import org.http4s.EntityEncoder
+  import org.http4s.circe.*
+  import io.circe.generic.semiauto.*
+  import io.circe.*
+  import io.circe.syntax.*
+  import neotype.Newtype
+  import neotype.interop.cats.given
+  import neotype.interop.circe.given
+
+  import java.time.format.DateTimeFormatter
+
+  def apply(id: Member.Id, name: Name, email: Email, createdAt: LocalDateTime): Member = 
+    Member(id, name, email, createdAt, Status.Pending)
   
   type Id = Id.Type
   object Id extends Newtype[String]:
@@ -40,6 +46,41 @@ object Member:
       val id = s"MBR${currtime.format(datetimeFormatter)}"
       Id.make(id).toOption.get
     }
+
+  enum Status:
+    case Active, Pending
+
+  object Status:
+    import doobie.*
+    import io.circe.HCursor
+    import io.circe.Decoder.Result
+    import io.circe.DecodingFailure
+
+    given Encoder[Status] = Encoder.instance {
+      case Active  => "active".asJson
+      case Pending => "pending".asJson
+    }
+    
+    given Decoder[Status] with
+      def apply(c: HCursor): Result[Status] = 
+        for
+          str <- c.as[String]
+          res <- str match
+            case "active"   => Right(Status.Active)
+            case "pending"  => Right(Status.Pending)
+            case _          => Left(DecodingFailure("Not match option", List())) 
+        yield res
+
+    given Meta[Status] =
+      Meta[String].tiemap {
+        case "active"   => Right(Status.Active)
+        case "pending"  => Right(Status.Pending)
+        case _          => Left("Value is not in options")
+      } {
+        case Active   => "active"
+        case Pending  => "pending"
+      }
+
 
   given Encoder[Member] = deriveEncoder
   given Decoder[Member] = deriveDecoder

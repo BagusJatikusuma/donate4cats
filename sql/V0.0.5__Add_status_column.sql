@@ -1,0 +1,1 @@
+ALTER TABLE members ADD COLUMN status ENUM('active', 'pending') NOT NULL;
